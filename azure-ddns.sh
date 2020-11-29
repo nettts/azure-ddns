@@ -27,14 +27,6 @@ then
     exit 1
 fi
 
-# Verify 'ip' is there
-ipPath=$(which ip)
-if [[ -z $ipPath ]]
-then
-    echo "ip does not seem to be installed, but it is required for this script"
-    exit 1
-fi
-
 # Get public IP from akamai
 myPublicIpv4=$(curl http://whatismyip.akamai.com/)
 myPublicIpv6=$(curl http://ipv6.whatismyip.akamai.com/)
