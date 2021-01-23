@@ -68,7 +68,7 @@ then
 else
     echo "Current public IPv6 address $myPublicIpv6 is different from DNS IP address $myDnsIpv6. Updating DNS"
     # Login to Azure
-    az login --service-principal --tenant $tenantId --username $appId --password $appSecret >/dev/null 2>&1
+    az login --service-principal --tenant $tenantId --username $appId --password=$appSecret >/dev/null 2>&1
     # Configure default resource group to rgName
     az configure --defaults group=$rgName >/dev/null 2>&1
     # Remove old record from record-set
