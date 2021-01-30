@@ -15,6 +15,8 @@ zoneName="YOUR DNS ZONE TO UPDATE"
 # Existing A record-set name in your DNS zone
 recordsetName="YOUR RECORD TO UPDATE"
 # Prefix that will be searched to verify whether you are on the right network
+# Enable IPv6
+enableIpv6=true
 
 # FQDN
 fqdn=$recordsetName.$zoneName
@@ -29,13 +31,10 @@ fi
 
 # Get public IP from akamai
 myPublicIpv4=$(curl http://whatismyip.akamai.com/)
-myPublicIpv6=$(curl http://ipv6.whatismyip.akamai.com/)
 echo "The current IPv4 IP is $myPublicIpv4"
-echo "The current IPv6 IP is $myPublicIpv6"
 
 # Get existing public IP from DNS
 myDnsIpv4=$(dig +short @8.8.8.8 $fqdn A)
-myDnsIpv6=$(dig +short @8.8.8.8 $fqdn AAAA)
 
 if [ $myPublicIpv4 == $myDnsIpv4 ]
 then
@@ -62,27 +61,41 @@ else
     az logout
 fi
 
-if [ $myPublicIpv6 == $myDnsIpv6 ]
+if [ $enableIpv6 == true ]
 then
-    echo "DNS IPv6 up to date, nothing to be done"
-else
-    echo "Current public IPv6 address $myPublicIpv6 is different from DNS IP address $myDnsIpv6. Updating DNS"
-    # Login to Azure
-    az login --service-principal --tenant $tenantId --username $appId --password=$appSecret >/dev/null 2>&1
-    # Configure default resource group to rgName
-    az configure --defaults group=$rgName >/dev/null 2>&1
-    # Remove old record from record-set
-    az network dns record-set aaaa remove-record -n $recordsetName -z $zoneName --ipv6-address $myDnsIpv6 >/dev/null 2>&1
-    # Add new record to the record-set
-    az network dns record-set aaaa add-record -n $recordsetName -z $zoneName --ipv6-address $myPublicIpv6 --ttl 60 >/dev/null 2>&1
-    sleep 120
-    newDnsIpv6=$(dig +short @8.8.8.8 $fqdn AAAA)
-    if [ $myPublicIpv6 == $newDnsIpv6 ]
+    # Get public IPv6 from akamai
+    myPublicIpv6=$(curl http://ipv6.whatismyip.akamai.com/)
+    echo "The current IPv6 IP is $myPublicIpv6"
+    
+    # Get existing IPv6 from DNS
+    myDnsIpv6=$(dig +short @8.8.8.8 $fqdn AAAA)
+    
+    if [ $myPublicIpv6 == $myDnsIpv6 ]
     then
-        echo "DNS AAAA correctly updated and verified"
+        echo "DNS IPv6 up to date, nothing to be done"
+        
     else
-        echo "DNS AAAA updated, the verification was not successful yet, verify with the commnad 'nslookup $fqdn' in a few minutes/hours"
-   fi
-   # Bye!
-   az logout
+        echo "Current public IPv6 address $myPublicIpv6 is different from DNS IP address $myDnsIpv6. Updating DNS"
+        # Login to Azure
+        az login --service-principal --tenant $tenantId --username $appId --password=$appSecret >/dev/null 2>&1
+        # Configure default resource group to rgName
+        az configure --defaults group=$rgName >/dev/null 2>&1
+        # Remove old record from record-set
+        az network dns record-set aaaa remove-record -n $recordsetName -z $zoneName --ipv6-address $myDnsIpv6 >/dev/null 2>&1
+        # Add new record to the record-set
+        az network dns record-set aaaa add-record -n $recordsetName -z $zoneName --ipv6-address $myPublicIpv6 --ttl 60 >/dev/null 2>&1
+        sleep 120
+        newDnsIpv6=$(dig +short @8.8.8.8 $fqdn AAAA)
+        if [ $myPublicIpv6 == $newDnsIpv6 ]
+        then
+            echo "DNS AAAA correctly updated and verified"
+        
+        else
+            echo "DNS AAAA updated, the verification was not successful yet, verify with the commnad 'nslookup $fqdn' in a few minutes/hours"
+    
+        fi
+        
+        # Bye!
+        az logout
+    fi
 fi
