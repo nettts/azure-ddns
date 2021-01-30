@@ -29,7 +29,7 @@ then
     exit 1
 fi
 
-# Get public IP from akamai
+# Get public IPv4 from akamai
 myPublicIpv4=$(curl http://whatismyip.akamai.com/)
 echo "The current IPv4 IP is $myPublicIpv4"
 
