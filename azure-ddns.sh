@@ -40,7 +40,7 @@ if [ $myPublicIpv4 == $myDnsIpv4 ]
 then
     echo "DNS IPv4 up to date, nothing to be done"
 else
-    echo "Current public IP address $myPublicIpv4 different from DNS IP address $myDnsIpv4, proceeding to update DNS"
+    echo "Current public IPv4 address $myPublicIpv4 different from DNS IPv4 address $myDnsIpv4, proceeding to update DNS"
     # Login to Azure
     az login --service-principal --tenant $tenantId --username $appId --password=$appSecret >/dev/null 2>&1
     # Configure default resource group to rgName
@@ -75,7 +75,7 @@ then
         echo "DNS IPv6 up to date, nothing to be done"
         
     else
-        echo "Current public IPv6 address $myPublicIpv6 is different from DNS IP address $myDnsIpv6. Updating DNS"
+        echo "Current public IPv6 address $myPublicIpv6 is different from DNS IPv6 address $myDnsIpv6. Updating DNS"
         # Login to Azure
         az login --service-principal --tenant $tenantId --username $appId --password=$appSecret >/dev/null 2>&1
         # Configure default resource group to rgName
