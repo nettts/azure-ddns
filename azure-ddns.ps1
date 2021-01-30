@@ -28,16 +28,15 @@ Write-Host "Resolving current IP in DNS..`t" -ForegroundColor White -NoNewline
 $rs = Get-AzureRmDnsRecordSet -Name $hostname -ZoneName $dnsZone -ResourceGroupName $resourceGroup -RecordType A
 Write-Host $rs.Records.IPv4Address -ForegroundColor Green
 
-if (-Not ($dynamicIP.Content -eq $rs.Records))
-{
+if (-Not ($dynamicIP.Content -eq $rs.Records)) {
 Write-Host "Updating IP to DNS.. " -ForegroundColor White -NoNewline
 $rs.Records[0].Ipv4Address = $dynamicIP.Content
 Set-AzureRmDnsRecordSet -RecordSet $rs
 Write-Host "OK" -ForegroundColor Green
-}
-else
-{
+
+}else {
 Write-Host "IP hasn't changed -- no need to update." -ForegroundColor White
+
 }
 
 if ($enableIpv6 -eq $true) {
