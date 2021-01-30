@@ -19,23 +19,23 @@ Write-Host "Authenticating to Azure..`t" -ForegroundColor White -NoNewline
 Login-AzureRmAccount -ServicePrincipal -Credential $cred -TenantId $tenantID -Subscription $subscriptionID
 Write-Host "OK" -ForegroundColor Green
 
-Write-Host "Resolving dynamic IP..`t`t" -ForegroundColor White -NoNewline
-$dynamicIP = Invoke-WebRequest 'http://whatismyip.akamai.com/' | select Content
-Write-Host $dynamicIP.Content -ForegroundColor Green
+Write-Host "Resolving dynamic IPv4..`t`t" -ForegroundColor White -NoNewline
+$dynamicIPv4 = Invoke-WebRequest 'http://whatismyip.akamai.com/' | select Content
+Write-Host $dynamicIPv4.Content -ForegroundColor Green
 
-Write-Host "Resolving current IP in DNS..`t" -ForegroundColor White -NoNewline
+Write-Host "Resolving current IPv4 in DNS..`t" -ForegroundColor White -NoNewline
 
-$rs = Get-AzureRmDnsRecordSet -Name $hostname -ZoneName $dnsZone -ResourceGroupName $resourceGroup -RecordType A
-Write-Host $rs.Records.IPv4Address -ForegroundColor Green
+$rsv4 = Get-AzureRmDnsRecordSet -Name $hostname -ZoneName $dnsZone -ResourceGroupName $resourceGroup -RecordType A
+Write-Host $rsv4.Records.IPv4Address -ForegroundColor Green
 
-if (-Not ($dynamicIP.Content -eq $rs.Records)) {
-Write-Host "Updating IP to DNS.. " -ForegroundColor White -NoNewline
-$rs.Records[0].Ipv4Address = $dynamicIP.Content
+if (-Not ($dynamicIPv4.Content -eq $rsv4.Records)) {
+Write-Host "Updating IPv4 to DNS.. " -ForegroundColor White -NoNewline
+$rsv4.Records[0].Ipv4Address = $dynamicIPv4.Content
 Set-AzureRmDnsRecordSet -RecordSet $rs
 Write-Host "OK" -ForegroundColor Green
 
 }else {
-Write-Host "IP hasn't changed -- no need to update." -ForegroundColor White
+Write-Host "IPv4 hasn't changed -- no need to update." -ForegroundColor White
 
 }
 
@@ -50,12 +50,12 @@ if ($enableIpv6 -eq $true) {
   Write-Host $rsv6.Records.IPv6Address -ForegroundColor Green
 
   if (-Not ($dynamicIPv6.Content -eq $rsv6.Records)) {
-    Write-Host "Updating IP to DNS.. " -ForegroundColor White -NoNewline
+    Write-Host "Updating IPv6 to DNS.. " -ForegroundColor White -NoNewline
     $rsv6.Records[0].Ipv6Address = $dynamicIPv6.Content
     Set-AzureRmDnsRecordSet -RecordSet $rsv6
     Write-Host "OK" -ForegroundColor Green
   
   }else {
-    Write-Host "IP hasn't changed -- no need to update." -ForegroundColor White
+    Write-Host "IPv6 hasn't changed -- no need to update." -ForegroundColor White
   }
 }
