@@ -33,7 +33,7 @@ fi
 myPublicIpv4=$(curl http://whatismyip.akamai.com/)
 echo "The current IPv4 IP is $myPublicIpv4"
 
-# Get existing public IP from DNS
+# Get existing public IPv4 from DNS
 myDnsIpv4=$(dig +short @8.8.8.8 $fqdn A)
 
 if [ $myPublicIpv4 == $myDnsIpv4 ]
